@@ -1,6 +1,11 @@
+import { Character } from "@/types/characters";
 import { ReactComponent as Ellipse } from "../../assets/ellipse.svg";
 
-const ItemSlider = () => {
+interface ItemSliderProps {
+  item: Character;
+}
+
+const ItemSlider = ({ item }: ItemSliderProps) => {
   return (
     <>
       <div className="flex">
@@ -8,8 +13,8 @@ const ItemSlider = () => {
           <div className="mb-2">
             <img
               className="rounded-xl shadow-lg"
-              src="https://rickandmortyapi.com/api/character/avatar/361.jpeg"
-              alt="imgRickAndMorty"
+              src={item.image}
+              alt={item.name}
             />
           </div>
 
@@ -18,13 +23,17 @@ const ItemSlider = () => {
             {/* name, status and species */}
             <div>
               <h2 className="text-2xl font-semibold tracking-tight">
-                Character name
+                {item.name}
               </h2>
               <div className="flex items-center gap-2">
-                <Ellipse fill={"#d63d2e"} className="h-3" />
-                <Ellipse fill={"#55cc44"} className="h-3" />
+                {item.status === "Alive" ? (
+                  <Ellipse fill={"#55cc44"} className="h-3" />
+                ) : (
+                  <Ellipse fill={"#d63d2e"} className="h-3" />
+                )}
+
                 <span className="text-lg font-semibold tracking-tight">
-                  {"Alive"} - {"Human"}
+                  {item.status} - {item.species}
                 </span>
               </div>
             </div>
@@ -35,7 +44,7 @@ const ItemSlider = () => {
                 last known location:
               </span>
               <span className="text-lg font-semibold tracking-tight">
-                {"Earth (Replacement Dimension)"}
+                {item.location.name}
               </span>
             </div>
           </div>
