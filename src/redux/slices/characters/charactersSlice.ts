@@ -1,20 +1,19 @@
+import toast from "react-hot-toast";
 import { createSlice } from "@reduxjs/toolkit";
+import { Character } from "@/types/characters";
+
 import { fetchCharacters } from "./charactersActions";
-import { Character, InfoCharacter } from "@/types/characters";
 
 interface CharacterState {
-  characters: {
-    info: InfoCharacter;
-    results: Character[];
-  } | null;
+  characters: Character[];
   currentCharacter: Character | null;
-  currentPage: number;
+  loading: boolean;
 }
 
 const initialState: CharacterState = {
-  characters: null,
+  characters: [],
   currentCharacter: null,
-  currentPage: 1,
+  loading: false,
 };
 
 export const charactersSlice = createSlice({
@@ -24,35 +23,29 @@ export const charactersSlice = createSlice({
     loadCharacters: (state, action) => {
       state.characters = action.payload;
     },
-    addCharacters: (state, action) => {
-      if (state.characters) {
-        state.characters.results = [
-          ...state.characters.results,
-          ...action.payload,
-        ];
-      }
+    setCurrentCharacter: (state, action) => {
+      state.currentCharacter = action.payload;
     },
   },
   extraReducers: (builder) => {
+    builder.addCase(fetchCharacters.pending, (state) => {
+      state.loading = true;
+    });
     builder.addCase(fetchCharacters.fulfilled, (state, action) => {
-      if (state.currentCharacter === null) {
-        state.currentCharacter = action.payload.results[0];
-        state.currentPage = 1;
-      }
-      if (!state.characters || state.characters?.results.length === 0) {
-        state.characters = action.payload;
-        return;
-      } else {
-        state.characters.results = [
-          ...state.characters.results,
-          ...action.payload.results,
-        ];
-        return;
-      }
+      state.characters?.push(action.payload);
+      state.currentCharacter = action.payload;
+      state.loading = false;
+    });
+    builder.addCase(fetchCharacters.rejected, (state) => {
+      state.loading = false;
+      toast.error("Error loading characters", {
+        duration: 4000,
+        position: "bottom-right",
+      });
     });
   },
 });
 
-export const { loadCharacters, addCharacters } = charactersSlice.actions;
+export const { loadCharacters, setCurrentCharacter } = charactersSlice.actions;
 
 export default charactersSlice.reducer;
